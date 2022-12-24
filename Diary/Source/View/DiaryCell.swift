@@ -87,4 +87,14 @@ final class DiaryCell: UITableViewCell, ReusableView {
         createdDateLabel.text = diary.date
         bodyLabel.text = diary.body
     }
+    
+    func configureWithCoreData(with diary: DiaryData) {
+        guard let date = diary.createdAt else { return }
+        
+        titleLabel.text = diary.title
+        createdDateLabel.text = DateFormatter.converted(date: date,
+                                                        locale: Locale.preference,
+                                                        dateStyle: .long)
+        bodyLabel.text = diary.body
+    }
 }

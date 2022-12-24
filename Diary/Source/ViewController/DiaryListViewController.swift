@@ -2,6 +2,7 @@
 //  Created by Ayaan, zhilly on 2022/12/20
 
 import UIKit
+import CoreData
 
 final class DiaryListViewController: UIViewController {
     private enum DiarySection: Hashable {
@@ -11,6 +12,8 @@ final class DiaryListViewController: UIViewController {
         static let title = "일기장"
         static let sampleDataName = "sample"
     }
+    
+    var container: NSPersistentContainer?
     
     private let diaryTableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
@@ -22,7 +25,7 @@ final class DiaryListViewController: UIViewController {
     }()
     
     private lazy var diaryDataSource: UITableViewDiffableDataSource = {
-        let dataSource = UITableViewDiffableDataSource<DiarySection, Diary>(
+        let dataSource = UITableViewDiffableDataSource<DiarySection, DiaryData>(
             tableView: diaryTableView
         ) { (tableView, indexPath, diary) -> UITableViewCell? in
             guard let cell = tableView.dequeueReusableCell(
@@ -30,7 +33,7 @@ final class DiaryListViewController: UIViewController {
                 for: indexPath
             ) as? DiaryCell else { return nil }
             
-            cell.configure(with: diary)
+            cell.configureWithCoreData(with: diary)
             
             return cell
         }
@@ -49,8 +52,14 @@ final class DiaryListViewController: UIViewController {
         title = Constant.title
         diaryTableView.delegate = self
         
+        setupContainer()
         setupViews()
         setupBarButtonItem()
+    }
+    
+    private func setupContainer() {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        self.container = appDelegate.persistentContainer
     }
     
     private func setupViews() {
@@ -85,16 +94,32 @@ final class DiaryListViewController: UIViewController {
     }
     
     private func applySampleData() {
-        guard let sampleData = NSDataAsset(name: Constant.sampleDataName),
-              let sampleDiary: [Diary] = try? JSONDecoder().decode([Diary].self,
-                                                                   from: sampleData.data) else {
-            return
-        }
-        var snapshot = NSDiffableDataSourceSnapshot<DiarySection, Diary>()
+        guard let diaryData = try? self.container?.viewContext.fetch(DiaryData.fetchRequest()) as? [DiaryData]
+        else { return }
+        
+        var snapshot = NSDiffableDataSourceSnapshot<DiarySection, DiaryData>()
         
         snapshot.appendSections([.main])
-        snapshot.appendItems(sampleDiary)
+        snapshot.appendItems(diaryData)
         diaryDataSource.apply(snapshot)
+    }
+    
+    private func appendSampleData() {
+        guard let container = self.container?.viewContext else { return }
+        guard let entity = NSEntityDescription.entity(forEntityName: "DiaryData", in: container) else {
+            return
+        }
+        
+        let diary = NSManagedObject(entity: entity, insertInto: container)
+        diary.setValue("잘 되니?..", forKey: "title")
+        diary.setValue("잘 되니?..", forKey: "body")
+        diary.setValue(Date(), forKey: "createdAt")
+        
+        do {
+            try container.save()
+        } catch {
+            print(error.localizedDescription)
+        }
     }
 }
 
@@ -103,6 +128,6 @@ extension DiaryListViewController: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: false)
         
         guard let diary = diaryDataSource.itemIdentifier(for: indexPath) else { return }
-        pushDiaryViewController(with: diary)
+        //pushDiaryViewController(with: diary)
     }
 }
