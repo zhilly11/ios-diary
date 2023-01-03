@@ -4,17 +4,17 @@
 import Foundation
 
 struct Diary: ManagedObjectModel {
+    let objectID: String
     var content: String
-    var createdAt: Date
-    var objectID: String?
+    let createdAt: Date
+    let weatherCondition: String?
+    let weatherIconID: String?
     
     init?(from diaryData: DiaryData) {
-        guard let content = diaryData.content,
-              let createdAt = diaryData.createdAt else {
-            return nil
-        }
-        self.content = content
-        self.createdAt = createdAt
         self.objectID = diaryData.objectID.uriRepresentation().absoluteString
+        self.content = diaryData.content
+        self.createdAt = diaryData.createdAt
+        self.weatherCondition = diaryData.weatherCondition
+        self.weatherIconID = diaryData.weatherIconID
     }
 }

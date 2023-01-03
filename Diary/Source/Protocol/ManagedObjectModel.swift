@@ -5,7 +5,7 @@ import CoreData.NSManagedObject
 
 protocol ManagedObjectModel: Hashable {
     associatedtype Object: NSManagedObject
-    var objectID: String? { get set }
+    var objectID: String { get }
     
     init?(from: Object)
 }
