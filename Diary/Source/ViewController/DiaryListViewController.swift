@@ -74,10 +74,11 @@ final class DiaryListViewController: UIViewController {
     }
     
     private func setupBarButtonItem() {
+        let addAction: UIAction = .init { _ in
+            self.tappedAddButton()
+        }
         let rightBarButton = UIBarButtonItem(image: UIImage(systemName: "plus"),
-                                             style: .plain,
-                                             target: self,
-                                             action: #selector(tappedAddButton))
+                                             primaryAction: addAction)
         
         navigationItem.setRightBarButton(rightBarButton, animated: true)
     }
@@ -124,8 +125,7 @@ final class DiaryListViewController: UIViewController {
         diaryDataSource.apply(snapshot)
     }
     
-    @objc
-    private func tappedAddButton(_ sender: UIBarButtonItem) {
+    private func tappedAddButton() {
         do {
             try diaryManager.add(nil)
             fetchDiaries()
@@ -137,7 +137,6 @@ final class DiaryListViewController: UIViewController {
         }
     }
     
-    @objc
     private func fetchDiaries() {
         do {
             let diaries = try diaryManager.fetchObjects()

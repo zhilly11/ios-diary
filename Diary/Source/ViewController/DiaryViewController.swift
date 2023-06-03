@@ -89,11 +89,11 @@ final class DiaryViewController: UIViewController {
     }
     
     private func setupBarButtonItem() {
+        let detailAction: UIAction = .init { _ in
+            self.tappedDetailButton()
+        }
         let rightBarButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"),
-                                             style: .plain,
-                                             target: self,
-                                             action: #selector(tappedDetailButton))
-        
+                                             primaryAction: detailAction)
         navigationItem.setRightBarButton(rightBarButton, animated: true)
     }
     
@@ -141,7 +141,6 @@ final class DiaryViewController: UIViewController {
         present(activityViewController, animated: true)
     }
     
-    @objc
     private func tappedDetailButton() {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         let shareAction = UIAlertAction(title: Constant.shareActionTitle,
