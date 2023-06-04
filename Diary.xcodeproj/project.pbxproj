@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B409BC932A2C8E1C00F548F5 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B409BC922A2C8E1C00F548F5 /* NetworkError.swift */; };
 		B409BC952A2C8E3D00F548F5 /* Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = B409BC942A2C8E3D00F548F5 /* Weather.swift */; };
 		B414FEE22952D2C400E7AC2A /* DateFormatter+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B414FEE12952D2C400E7AC2A /* DateFormatter+Extension.swift */; };
 		B414FEE42952D8AC00E7AC2A /* Locale+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B414FEE32952D8AC00E7AC2A /* Locale+Extension.swift */; };
@@ -39,6 +40,7 @@
 /* Begin PBXFileReference section */
 		29EED53ECB802965115A1763 /* Pods-Diary.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Diary.debug.xcconfig"; path = "Target Support Files/Pods-Diary/Pods-Diary.debug.xcconfig"; sourceTree = "<group>"; };
 		9B62CDBF03119E61C8407448 /* Pods_Diary.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Diary.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B409BC922A2C8E1C00F548F5 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
 		B409BC942A2C8E3D00F548F5 /* Weather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weather.swift; sourceTree = "<group>"; };
 		B414FEE12952D2C400E7AC2A /* DateFormatter+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateFormatter+Extension.swift"; sourceTree = "<group>"; };
 		B414FEE32952D8AC00E7AC2A /* Locale+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Locale+Extension.swift"; sourceTree = "<group>"; };
@@ -97,6 +99,15 @@
 				9B62CDBF03119E61C8407448 /* Pods_Diary.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		B409BC8F2A2B2ECC00F548F5 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				B409BC902A2B2ED900F548F5 /* NetworkManager.swift */,
+				B409BC922A2C8E1C00F548F5 /* NetworkError.swift */,
+			);
+			path = Network;
 			sourceTree = "<group>";
 		};
 		B42D5DB129630FC300BE46B2 /* Alert */ = {
@@ -211,6 +222,7 @@
 		D34F1E742952EDBB00C1CF62 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				B409BC8F2A2B2ECC00F548F5 /* Network */,
 				D349380729593D9500AC4697 /* Common */,
 				B4C1C51029544C5F008A130F /* Protocol */,
 				D34F1E6F2952ED4400C1CF62 /* Model */,
@@ -366,6 +378,7 @@
 				B48B3663295550CF00D40CC1 /* DiaryTextView.swift in Sources */,
 				B4CEA6A2295193790079FBDF /* DiaryCell.swift in Sources */,
 				D34938032959352300AC4697 /* DiaryData+CoreDataClass.swift in Sources */,
+				B409BC932A2C8E1C00F548F5 /* NetworkError.swift in Sources */,
 				B414FEE42952D8AC00E7AC2A /* Locale+Extension.swift in Sources */,
 				C739AE27284DF28600741E8F /* SceneDelegate.swift in Sources */,
 				B42D5DB029630F9900BE46B2 /* AlertFactory.swift in Sources */,
