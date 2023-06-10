@@ -4,24 +4,33 @@
 import UIKit
 import CoreLocation
 
+/// 일기장 상세 화면
 final class DiaryViewController: UIViewController {
+    
+    // MARK: - typealias & enum
+
     private enum Constant {
-        static let deleteAlertTitle = "진짜요??🤔"
-        static let deleteAlertMessage = "정말로 삭제 하시겠어요??🙏"
+        static let deleteAlertTitle = "진짜요?"
+        static let deleteAlertMessage = "정말로 삭제 하시겠어요?"
         static let deleteActionTitle = "삭제"
         static let shareActionTitle = "공유"
         static let cancelActionTitle = "취소"
         static let deleteFailAlertTitle = "다이어리 삭제 실패"
         static let saveFailAlertTitle = "다이어리 저장 실패"
     }
-    private let contentTextView = DiaryTextView(font: .preferredFont(forTextStyle: .body),
-                                                textAlignment: .left,
-                                                textColor: .black)
-    private let locationManager: CLLocationManager?
-    private var networkManager: NetworkManager?
-    private let diaryManager: DiaryManager = DiaryManager.shared
-    private var diary: Diary
     
+    // MARK: - Properties
+    
+    private var diary: Diary
+    private let diaryManager: DiaryManager = DiaryManager.shared
+    private var networkManager: NetworkManager?
+    private let locationManager: CLLocationManager?
+    private let contentTextView: DiaryTextView = .init(font: .preferredFont(forTextStyle: .body),
+                                                       textAlignment: .left,
+                                                       textColor: .black)
+    
+    // MARK: - Initializer
+
     init(diary: Diary) {
         self.diary = diary
         self.locationManager = CLLocationManager()
@@ -33,6 +42,8 @@ final class DiaryViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - View Life Cycle
+
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
@@ -41,6 +52,7 @@ final class DiaryViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         locationManager?.requestWhenInUseAuthorization()
+        
         if diary.content.isEmpty == false {
             contentTextView.contentOffset = .zero
         }
@@ -48,6 +60,7 @@ final class DiaryViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
         if diary.content.isEmpty == true {
             contentTextView.becomeFirstResponder()
         }
@@ -55,6 +68,7 @@ final class DiaryViewController: UIViewController {
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
+        
         if diary.content.isEmpty == true {
             do {
                 try diaryManager.remove(diary)
@@ -64,6 +78,8 @@ final class DiaryViewController: UIViewController {
         }
     }
     
+    // MARK: - Method
+
     private func configure() {
         title = DateFormatter.converted(date: diary.createdAt,
                                         locale: Locale.preference,
@@ -85,7 +101,7 @@ final class DiaryViewController: UIViewController {
         view.addSubview(contentTextView)
         contentTextView.translatesAutoresizingMaskIntoConstraints = false
         
-        let safeArea = view.safeAreaLayoutGuide
+        let safeArea: UILayoutGuide = view.safeAreaLayoutGuide
         
         NSLayoutConstraint.activate([
             contentTextView.topAnchor.constraint(equalTo: safeArea.topAnchor, constant: 8),
@@ -100,8 +116,9 @@ final class DiaryViewController: UIViewController {
         let detailAction: UIAction = .init { _ in
             self.tappedDetailButton()
         }
-        let rightBarButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"),
-                                             primaryAction: detailAction)
+        let rightBarButton: UIBarButtonItem = .init(image: UIImage(systemName: "ellipsis"),
+                                                    primaryAction: detailAction)
+        
         navigationItem.setRightBarButton(rightBarButton, animated: true)
     }
     
@@ -117,14 +134,14 @@ final class DiaryViewController: UIViewController {
     }
     
     private func showDeleteAlert() {
-        let alert = UIAlertController(title: Constant.deleteAlertTitle,
-                                      message: Constant.deleteAlertMessage,
-                                      preferredStyle: .alert)
-        let deleteAction = UIAlertAction(title: Constant.deleteActionTitle,
-                                         style: .destructive) { [weak self] _ in
+        let alert: UIAlertController = .init(title: Constant.deleteAlertTitle,
+                                             message: Constant.deleteAlertMessage,
+                                             preferredStyle: .alert)
+        let deleteAction: UIAlertAction = .init(title: Constant.deleteActionTitle,
+                                                style: .destructive) { [weak self] _ in
             self?.deleteDiary()
         }
-        let cancelAction = UIAlertAction(title: Constant.cancelActionTitle, style: .cancel)
+        let cancelAction: UIAlertAction = .init(title: Constant.cancelActionTitle, style: .cancel)
         
         [cancelAction, deleteAction].forEach(alert.addAction(_:))
         
@@ -137,30 +154,35 @@ final class DiaryViewController: UIViewController {
             navigationController?.popViewController(animated: true)
         } catch {
             NSLog("Diary Delete Failed")
-            let alert = AlertFactory.make(.failure(title: Constant.deleteFailAlertTitle, message: nil))
+            let alert: UIAlertController = AlertFactory.make(
+                .failure(title: Constant.deleteFailAlertTitle, message: nil)
+            )
+            
             present(alert, animated: true)
         }
     }
     
     private func showShareActivityView() {
-        let activityViewController = UIActivityViewController(activityItems: [diary.content],
-                                                              applicationActivities: nil)
+        let activityViewController: UIActivityViewController = .init(activityItems: [diary.content],
+                                                                     applicationActivities: nil)
         
         present(activityViewController, animated: true)
     }
     
     private func tappedDetailButton() {
-        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        let shareAction = UIAlertAction(title: Constant.shareActionTitle,
-                                        style: .default) { [weak self] _ in
+        let actionSheet: UIAlertController = .init(title: nil,
+                                                   message: nil,
+                                                   preferredStyle: .actionSheet)
+        let shareAction: UIAlertAction = .init(title: Constant.shareActionTitle,
+                                               style: .default) { [weak self] _ in
             self?.saveDiary()
             self?.showShareActivityView()
         }
-        let deleteAction = UIAlertAction(title: Constant.deleteActionTitle,
-                                         style: .destructive) { [weak self] _ in
+        let deleteAction: UIAlertAction = .init(title: Constant.deleteActionTitle,
+                                                style: .destructive) { [weak self] _ in
             self?.showDeleteAlert()
         }
-        let cancelAction = UIAlertAction(title: Constant.cancelActionTitle, style: .cancel)
+        let cancelAction: UIAlertAction = .init(title: Constant.cancelActionTitle, style: .cancel)
         
         [shareAction, deleteAction, cancelAction].forEach(actionSheet.addAction(_:))
         
@@ -175,17 +197,24 @@ final class DiaryViewController: UIViewController {
             try diaryManager.update(diary)
         } catch {
             NSLog("Diary Save Failed")
-            let alert = AlertFactory.make(.failure(title: Constant.saveFailAlertTitle, message: nil))
+            let alert: UIAlertController = AlertFactory.make(
+                .failure(title: Constant.saveFailAlertTitle, message: nil)
+            )
+            
             present(alert, animated: true)
         }
     }
 }
+
+// MARK: - TextViewDelegate
 
 extension DiaryViewController: UITextViewDelegate {
     func textViewDidEndEditing(_ textView: UITextView) {
         saveDiary()
     }
 }
+
+// MARK: - CLLocationManagerDelegate
 
 extension DiaryViewController: CLLocationManagerDelegate {
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
@@ -205,13 +234,13 @@ extension DiaryViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if diary.weatherMain == nil,
            diary.weatherIconID == nil,
-           let coordinate = locations.last?.coordinate {
+           let coordinate: CLLocationCoordinate2D = locations.last?.coordinate {
             networkManager = NetworkManager()
 
             Task.init {
                 do {
                     guard let networkManager = networkManager else { return }
-                    let weather = try await networkManager.getWeatherInformation(
+                    let weather: Weather = try await networkManager.getWeatherInformation(
                         latitude: coordinate.latitude.description,
                         longitude: coordinate.longitude.description
                     )
@@ -219,8 +248,10 @@ extension DiaryViewController: CLLocationManagerDelegate {
                     diary.weatherMain = weather.main
                     diary.weatherIconID = weather.icon
                 } catch {
-                    let alert = AlertFactory.make(.failure(title: error.localizedDescription,
-                                                           message: nil))
+                    let alert: UIAlertController = AlertFactory.make(
+                        .failure(title: error.localizedDescription, message: nil)
+                    )
+                    
                     present(alert, animated: true)
                 }
             }

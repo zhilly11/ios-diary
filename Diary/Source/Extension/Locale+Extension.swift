@@ -5,7 +5,10 @@ import Foundation
 
 extension Locale {
     static var preference: Locale {
-        guard let preferredLocaleIdentifier = Locale.preferredLanguages.first else { return current }
+        guard let preferredLocaleIdentifier: String = Locale.preferredLanguages.first else {
+            return current
+        }
+        
         return Locale(identifier: preferredLocaleIdentifier)
     }
 }

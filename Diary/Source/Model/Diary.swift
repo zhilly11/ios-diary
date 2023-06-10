@@ -11,10 +11,11 @@ struct Diary: ManagedObjectModel {
     var weatherIconID: String?
     
     init?(from diaryData: DiaryData) {
-        guard let content = diaryData.content,
-              let createdAt = diaryData.createdAt else {
+        guard let content: String = diaryData.content,
+              let createdAt: Date = diaryData.createdAt else {
             return nil
         }
+        
         self.content = content
         self.createdAt = createdAt
         self.objectID = diaryData.objectID.uriRepresentation().absoluteString

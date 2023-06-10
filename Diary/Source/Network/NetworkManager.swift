@@ -22,22 +22,24 @@ final class NetworkManager {
     }
     
     func getWeatherInformation(latitude: String, longitude: String) async throws -> Weather {
-        guard let url = URL(string: API.getURL(latitude: latitude, longitude: longitude)) else {
+        guard let url: URL = .init(string: API.getURL(latitude: latitude, longitude: longitude)) else {
             throw NetworkError.invalidURL
         }
         
-        let (data, response) = try await URLSession.shared.data(from: url)
-        let successRange = (200..<300)
+        let (data, response): (Data, URLResponse) = try await URLSession.shared.data(from: url)
+        let successRange: (Range<Int>) = (200..<300)
         
-        guard let httpResponse = response as? HTTPURLResponse,
+        guard let httpResponse: HTTPURLResponse = response as? HTTPURLResponse,
               successRange.contains(httpResponse.statusCode) else {
             throw NetworkError.invalidServerResponse
         }
         
         let decoder: JSONDecoder = JSONDecoder()
         
-        guard let weatherInformation = try? decoder.decode(WeatherInformation.self, from: data),
-              let firstItem = weatherInformation.weather.first else {
+        guard let weatherInformation: WeatherInformation = try? decoder.decode(
+            WeatherInformation.self, from: data
+        ),
+              let firstItem: Weather = weatherInformation.weather.first else {
             throw NetworkError.unsupportedData
         }
         
@@ -45,14 +47,14 @@ final class NetworkManager {
     }
     
     func fetchWeatherIcon(id: String) async throws -> Data {
-        guard let url = URL(string: API.iconURL + id + API.imageFormat) else {
+        guard let url: URL = .init(string: API.iconURL + id + API.imageFormat) else {
             throw NetworkError.invalidURL
         }
         
-        let (data, response) = try await URLSession.shared.data(from: url)
-        let successRange = (200..<300)
+        let (data, response): (Data, URLResponse) = try await URLSession.shared.data(from: url)
+        let successRange: (Range<Int>) = (200..<300)
         
-        guard let httpResponse = response as? HTTPURLResponse,
+        guard let httpResponse: HTTPURLResponse = response as? HTTPURLResponse,
               successRange.contains(httpResponse.statusCode) else {
             throw NetworkError.invalidServerResponse
         }

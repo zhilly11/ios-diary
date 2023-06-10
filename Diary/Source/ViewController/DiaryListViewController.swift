@@ -3,10 +3,18 @@
 
 import UIKit
 
+/// 다이어리 목록 화면
 final class DiaryListViewController: UIViewController {
+    
+    // MARK: - typealias & enum
+
+    private typealias DataSource = UITableViewDiffableDataSource<DiarySection, Diary>
+    private typealias SnapShot = NSDiffableDataSourceSnapshot<DiaryListViewController.DiarySection, Diary>
+    
     private enum DiarySection: Hashable {
         case main
     }
+    
     private enum Constant {
         static let title = "일기장"
         static let sampleDataName = "sample"
@@ -14,10 +22,13 @@ final class DiaryListViewController: UIViewController {
         static let deleteFailAlertTitle = "다이어리 삭제 실패"
         static let addFailAlertTitle = "다이어리 생성 실패"
     }
-    private let diaryManager = DiaryManager.shared
+    
+    // MARK: - Properties
+    
+    private let diaryManager: DiaryManager = DiaryManager.shared
     
     private let diaryTableView: UITableView = {
-        let tableView = UITableView(frame: .zero, style: .plain)
+        let tableView: UITableView = .init(frame: .zero, style: .plain)
         
         tableView.register(DiaryCell.self, forCellReuseIdentifier: DiaryCell.reuseIdentifier)
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -26,10 +37,11 @@ final class DiaryListViewController: UIViewController {
     }()
     
     private lazy var diaryDataSource: UITableViewDiffableDataSource = {
-        let dataSource = UITableViewDiffableDataSource<DiarySection, Diary>(
+        let dataSource: DataSource = .init(
             tableView: diaryTableView
         ) { (tableView, indexPath, diary) -> UITableViewCell? in
-            guard let cell = tableView.dequeueReusableCell(
+            
+            guard let cell: DiaryCell = tableView.dequeueReusableCell(
                 withIdentifier: DiaryCell.reuseIdentifier,
                 for: indexPath
             ) as? DiaryCell else { return nil }
@@ -42,6 +54,8 @@ final class DiaryListViewController: UIViewController {
         return dataSource
     }()
     
+    // MARK: - View Life Cycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
@@ -51,6 +65,8 @@ final class DiaryListViewController: UIViewController {
         super.viewDidAppear(animated)
         fetchDiaries()
     }
+    
+    // MARK: - Method
     
     private func configure() {
         view.backgroundColor = .systemBackground
@@ -62,7 +78,7 @@ final class DiaryListViewController: UIViewController {
     }
     
     private func setupViews() {
-        let safeArea = view.safeAreaLayoutGuide
+        let safeArea: UILayoutGuide = view.safeAreaLayoutGuide
         
         view.addSubview(diaryTableView)
         NSLayoutConstraint.activate([
@@ -77,24 +93,22 @@ final class DiaryListViewController: UIViewController {
         let addAction: UIAction = .init { _ in
             self.tappedAddButton()
         }
-        let rightBarButton = UIBarButtonItem(image: UIImage(systemName: "plus"),
-                                             primaryAction: addAction)
+        let rightBarButton: UIBarButtonItem = .init(image: UIImage(systemName: "plus"),
+                                                    primaryAction: addAction)
         
         navigationItem.setRightBarButton(rightBarButton, animated: true)
     }
     
     private func pushDiaryViewController(with indexPath: IndexPath) {
-        guard let diary = diaryDataSource.itemIdentifier(for: indexPath) else {
-            return
-        }
-        let diaryViewController = DiaryViewController(diary: diary)
+        guard let diary: Diary = diaryDataSource.itemIdentifier(for: indexPath) else { return }
+        let diaryViewController: DiaryViewController = .init(diary: diary)
         
         navigationController?.pushViewController(diaryViewController, animated: true)
     }
     
     private func showShareActivityView(for diary: Diary) {
-        let activityViewController = UIActivityViewController(activityItems: [diary.content],
-                                                              applicationActivities: nil)
+        let activityViewController: UIActivityViewController = .init(activityItems: [diary.content],
+                                                                     applicationActivities: nil)
         
         present(activityViewController, animated: true)
     }
@@ -105,20 +119,23 @@ final class DiaryListViewController: UIViewController {
             deleteDiaryItem(of: diary)
         } catch {
             NSLog("Diary Delete Failed")
-            let alert = AlertFactory.make(.failure(title: Constant.deleteFailAlertTitle, message: nil))
+            let alert: UIAlertController = AlertFactory.make(
+                .failure(title: Constant.deleteFailAlertTitle, message: nil)
+            )
+            
             present(alert, animated: true)
         }
     }
     
     private func deleteDiaryItem(of diary: Diary) {
-        var currentSnapshot = diaryDataSource.snapshot()
+        var snapshot: SnapShot = diaryDataSource.snapshot()
         
-        currentSnapshot.deleteItems([diary])
-        diaryDataSource.apply(currentSnapshot)
+        snapshot.deleteItems([diary])
+        diaryDataSource.apply(snapshot)
     }
     
     private func apply(_ diaries: [Diary]) {
-        var snapshot = NSDiffableDataSourceSnapshot<DiarySection, Diary>()
+        var snapshot: SnapShot = NSDiffableDataSourceSnapshot<DiarySection, Diary>()
         
         snapshot.appendSections([.main])
         snapshot.appendItems(diaries)
@@ -132,22 +149,28 @@ final class DiaryListViewController: UIViewController {
             pushDiaryViewController(with: Constant.firstDiary)
         } catch {
             NSLog("Diary Add Failed")
-            let alert = AlertFactory.make(.failure(title: Constant.addFailAlertTitle, message: nil))
+            let alert: UIAlertController = AlertFactory.make(
+                .failure(title: Constant.addFailAlertTitle, message: nil)
+            )
+            
             present(alert, animated: true)
         }
     }
     
     private func fetchDiaries() {
         do {
-            let diaries = try diaryManager.fetchObjects()
+            let diaries: [Diary] = try diaryManager.fetchObjects()
             apply(diaries)
         } catch {
             NSLog("Diaries Fetch Failed")
-            let alert = AlertFactory.make(.exit)
+            let alert: UIAlertController = AlertFactory.make(.exit)
+            
             present(alert, animated: true)
         }
     }
 }
+
+// MARK: - TableViewDelegate
 
 extension DiaryListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -159,9 +182,9 @@ extension DiaryListViewController: UITableViewDelegate {
         _ tableView: UITableView,
         trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
     ) -> UISwipeActionsConfiguration? {
-        let deleteAction = UIContextualAction(style: .destructive,
-                                              title: nil) { [weak self] (_, _, success) in
-            if let diary = self?.diaryDataSource.itemIdentifier(for: indexPath) {
+        let deleteAction: UIContextualAction = .init(style: .destructive,
+                                                     title: nil) { [weak self] (_, _, success) in
+            if let diary: Diary = self?.diaryDataSource.itemIdentifier(for: indexPath) {
                 self?.delete(diary)
                 success(true)
             } else {
@@ -170,9 +193,9 @@ extension DiaryListViewController: UITableViewDelegate {
         }
         deleteAction.image = UIImage(systemName: "trash.fill")
         
-        let shareAction = UIContextualAction(style: .normal,
-                                             title: nil) { [weak self] (_, _, success) in
-            if let diary = self?.diaryDataSource.itemIdentifier(for: indexPath) {
+        let shareAction: UIContextualAction = .init(style: .normal,
+                                                    title: nil) { [weak self] (_, _, success) in
+            if let diary: Diary = self?.diaryDataSource.itemIdentifier(for: indexPath) {
                 self?.showShareActivityView(for: diary)
                 success(true)
             } else {
