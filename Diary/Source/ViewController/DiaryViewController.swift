@@ -203,24 +203,25 @@ extension DiaryViewController: CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let coordinate = locations.last?.coordinate {
+        if diary.weatherMain == nil,
+           diary.weatherIconID == nil,
+           let coordinate = locations.last?.coordinate {
             networkManager = NetworkManager()
 
             Task.init {
                 do {
-                    let weather = try await networkManager?.getWeatherInformation(
+                    guard let networkManager = networkManager else { return }
+                    let weather = try await networkManager.getWeatherInformation(
                         latitude: coordinate.latitude.description,
                         longitude: coordinate.longitude.description
                     )
                     
-                    diary.weatherMain = weather?.main
-                    diary.weatherIconID = weather?.icon
+                    diary.weatherMain = weather.main
+                    diary.weatherIconID = weather.icon
                 } catch {
-                    switch error {
-                    case NetworkError.invalidServerResponse:
-                        let alert = AlertFactory.make(.failure(title: , message: <#T##String?#>))
-                    case NetworkError.unsupportedData:
-                    }
+                    let alert = AlertFactory.make(.failure(title: error.localizedDescription,
+                                                           message: nil))
+                    present(alert, animated: true)
                 }
             }
         }
