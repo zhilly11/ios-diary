@@ -7,15 +7,23 @@ import UIKit
 final class NetworkManager {
     private enum API {
         static let key: String = "964504ece769bee1b050028446a27f65"
-        static let baseURL: String = "https://api.openweathermap.org/data/2.5/weather?q="
         static let appid: String = "&appid="
         static let iconURL: String = "https://openweathermap.org/img/wn/"
         static let imageFormat: String = "@2x.png"
+        
+        static func getURL(latitude: String, longitude: String) -> String {
+            return "https://api.openweathermap.org/data/2.5/weather?lat="
+            + latitude
+            + "&lon="
+            + longitude
+            + appid
+            + key
+        }
     }
     
-    func getWeatherIconID(cityName: String) async throws -> String {
-        guard let url = URL(string: API.baseURL + cityName + API.appid + API.key) else {
-            throw NetworkError.url
+    func getWeatherInformation(latitude: String, longitude: String) async throws -> Weather {
+        guard let url = URL(string: API.getURL(latitude: latitude, longitude: longitude)) else {
+            throw NetworkError.invalidURL
         }
         
         let (data, response) = try await URLSession.shared.data(from: url)
@@ -33,12 +41,12 @@ final class NetworkManager {
             throw NetworkError.unsupportedData
         }
         
-        return firstItem.icon
+        return firstItem
     }
     
-    func fetchWeatherIcon(name: String) async throws -> UIImage {
-        guard let url = URL(string: API.iconURL + name + API.imageFormat) else {
-            throw NetworkError.url
+    func fetchWeatherIcon(id: String) async throws -> Data {
+        guard let url = URL(string: API.iconURL + id + API.imageFormat) else {
+            throw NetworkError.invalidURL
         }
         
         let (data, response) = try await URLSession.shared.data(from: url)
@@ -49,10 +57,6 @@ final class NetworkManager {
             throw NetworkError.invalidServerResponse
         }
         
-        guard let image = UIImage(data: data) else {
-            throw NetworkError.unsupportedImage
-        }
-        
-        return image
+        return data
     }
 }
