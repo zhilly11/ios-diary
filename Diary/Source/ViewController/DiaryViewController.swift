@@ -2,6 +2,7 @@
 //  Created by Ayaan, zhilly on 2022/12/21
 
 import UIKit
+import CoreLocation
 
 final class DiaryViewController: UIViewController {
     private enum Constant {
@@ -16,11 +17,14 @@ final class DiaryViewController: UIViewController {
     private let contentTextView = DiaryTextView(font: .preferredFont(forTextStyle: .body),
                                                 textAlignment: .left,
                                                 textColor: .black)
-    private let diaryManager = DiaryManager.shared
+    private let locationManager: CLLocationManager?
+    private var networkManager: NetworkManager?
+    private let diaryManager: DiaryManager = DiaryManager.shared
     private var diary: Diary
-
+    
     init(diary: Diary) {
         self.diary = diary
+        self.locationManager = CLLocationManager()
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -36,6 +40,7 @@ final class DiaryViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        locationManager?.requestWhenInUseAuthorization()
         if diary.content.isEmpty == false {
             contentTextView.contentOffset = .zero
         }
@@ -66,6 +71,9 @@ final class DiaryViewController: UIViewController {
         contentTextView.delegate = self
         contentTextView.keyboardDismissMode = .interactive
         
+        locationManager?.delegate = self
+        locationManager?.startMonitoringVisits()
+        
         setupView()
         setupBarButtonItem()
         setupData()
@@ -76,7 +84,7 @@ final class DiaryViewController: UIViewController {
         view.backgroundColor = .systemBackground
         view.addSubview(contentTextView)
         contentTextView.translatesAutoresizingMaskIntoConstraints = false
-
+        
         let safeArea = view.safeAreaLayoutGuide
         
         NSLayoutConstraint.activate([
@@ -176,5 +184,45 @@ final class DiaryViewController: UIViewController {
 extension DiaryViewController: UITextViewDelegate {
     func textViewDidEndEditing(_ textView: UITextView) {
         saveDiary()
+    }
+}
+
+extension DiaryViewController: CLLocationManagerDelegate {
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        switch manager.authorizationStatus {
+        case .authorizedWhenInUse, .authorizedAlways:
+            locationManager?.startUpdatingLocation()
+            locationManager?.stopUpdatingLocation()
+        case .restricted, .notDetermined:
+            locationManager?.requestWhenInUseAuthorization()
+        case .denied:
+            locationManager?.requestWhenInUseAuthorization()
+        default:
+            break
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let coordinate = locations.last?.coordinate {
+            networkManager = NetworkManager()
+
+            Task.init {
+                do {
+                    let weather = try await networkManager?.getWeatherInformation(
+                        latitude: coordinate.latitude.description,
+                        longitude: coordinate.longitude.description
+                    )
+                    
+                    diary.weatherMain = weather?.main
+                    diary.weatherIconID = weather?.icon
+                } catch {
+                    switch error {
+                    case NetworkError.invalidServerResponse:
+                        let alert = AlertFactory.make(.failure(title: , message: <#T##String?#>))
+                    case NetworkError.unsupportedData:
+                    }
+                }
+            }
+        }
     }
 }

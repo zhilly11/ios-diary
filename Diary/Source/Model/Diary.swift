@@ -7,6 +7,8 @@ struct Diary: ManagedObjectModel {
     var content: String
     var createdAt: Date
     var objectID: String?
+    var weatherMain: String?
+    var weatherIconID: String?
     
     init?(from diaryData: DiaryData) {
         guard let content = diaryData.content,
@@ -16,5 +18,7 @@ struct Diary: ManagedObjectModel {
         self.content = content
         self.createdAt = createdAt
         self.objectID = diaryData.objectID.uriRepresentation().absoluteString
+        self.weatherMain = diaryData.weatherMain
+        self.weatherIconID = diaryData.weatherIconID
     }
 }

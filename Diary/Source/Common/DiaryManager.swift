@@ -52,6 +52,8 @@ final class DiaryManager: CoreDataManageable {
         let object = context.object(with: objectID)
         
         object.setValue(diary.content, forKey: "content")
+        object.setValue(diary.weatherMain, forKey: "weatherMain")
+        object.setValue(diary.weatherIconID, forKey: "weatherIconID")
         
         try context.save()
     }
