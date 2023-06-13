@@ -7,7 +7,7 @@ import UIKit
 final class DiaryListViewController: UIViewController {
     
     // MARK: - typealias & enum
-
+    
     private typealias DataSource = UITableViewDiffableDataSource<DiarySection, Diary>
     private typealias SnapShot = NSDiffableDataSourceSnapshot<DiaryListViewController.DiarySection, Diary>
     
@@ -36,9 +36,13 @@ final class DiaryListViewController: UIViewController {
         return tableView
     }()
     
-    private lazy var diaryDataSource: UITableViewDiffableDataSource = {
-        let dataSource: DataSource = .init(
-            tableView: diaryTableView
+    private var diaryDataSource: DataSource
+    
+    // MARK: - Initializer
+    
+    init() {
+        self.diaryDataSource = .init(
+            tableView: self.diaryTableView
         ) { (tableView, indexPath, diary) -> UITableViewCell? in
             
             guard let cell: DiaryCell = tableView.dequeueReusableCell(
@@ -51,8 +55,13 @@ final class DiaryListViewController: UIViewController {
             return cell
         }
         
-        return dataSource
-    }()
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - View Life Cycle
     

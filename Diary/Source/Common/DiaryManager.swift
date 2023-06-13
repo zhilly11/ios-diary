@@ -7,7 +7,7 @@ import CoreData
 final class DiaryManager: CoreDataManageable {
     static let shared: DiaryManager = DiaryManager()
     
-    private lazy var persistentContainer: NSPersistentContainer = {
+    private let persistentContainer: NSPersistentContainer = {
         let container: NSPersistentContainer = .init(name: "Diary")
         
         container.loadPersistentStores(completionHandler: { (_, error) in
