@@ -37,7 +37,9 @@ final class DiaryManager: CoreDataManageable {
         diaryObject.setValue(diary?.content ?? String.init(), forKey: "content")
         diaryObject.setValue(diary?.createdAt ?? Date.now, forKey: "createdAt")
         
-        try context.save()
+        if context.hasChanges {
+            try context.save()
+        }
     }
     
     func fetchObjects() throws -> [Diary] {
@@ -58,7 +60,9 @@ final class DiaryManager: CoreDataManageable {
         object.setValue(diary.weatherMain, forKey: "weatherMain")
         object.setValue(diary.weatherIconID, forKey: "weatherIconID")
         
-        try context.save()
+        if context.hasChanges {
+            try context.save()
+        }
     }
     
     func remove(_ diary: Diary) throws {
@@ -69,7 +73,9 @@ final class DiaryManager: CoreDataManageable {
         
         context.delete(object)
         
-        try context.save()
+        if context.hasChanges {
+            try context.save()
+        }
     }
     
     func search(keyword: String) throws -> [Diary] {
