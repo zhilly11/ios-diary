@@ -7,7 +7,7 @@ final class DiaryCell: UITableViewCell, ReusableView {
     private let titleLabel: UILabel = {
         let label: UILabel = .init()
         
-        label.textColor = .black
+        label.textColor = UIColor.getTextColor()
         label.textAlignment = .left
         label.font = .preferredFont(forTextStyle: .title3)
         
@@ -17,7 +17,7 @@ final class DiaryCell: UITableViewCell, ReusableView {
     private let createdDateLabel: UILabel = {
         let label: UILabel = .init()
         
-        label.textColor = .black
+        label.textColor = UIColor.getTextColor()
         label.textAlignment = .left
         label.font = .preferredFont(forTextStyle: .body)
         
@@ -27,7 +27,7 @@ final class DiaryCell: UITableViewCell, ReusableView {
     private let bodyLabel: UILabel = {
         let label: UILabel = .init()
         
-        label.textColor = .black
+        label.textColor = UIColor.getTextColor()
         label.textAlignment = .left
         label.font = .preferredFont(forTextStyle: .caption1)
         
