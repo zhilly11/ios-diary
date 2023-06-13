@@ -108,16 +108,6 @@ final class DiaryCell: UITableViewCell, ReusableView {
         titleLabel.text = cellContents.title
         bodyLabel.text = cellContents.body
         createdDateLabel.text = cellContents.createdAt
-        loadWeatherIcon(id: diary.weatherIconID)
-    }
-    
-    private func loadWeatherIcon(id: String?) {
-        let networkManager: NetworkManager = NetworkManager()
-        guard let id: String = id else { return }
-        
-        Task.init {
-            let iconImageData: Data = try await networkManager.fetchWeatherIcon(id: id)
-            self.weatherIconImageView.image = UIImage(data: iconImageData)
-        }
+        weatherIconImageView.loadWeatherIcon(id: diary.weatherIconID)
     }
 }
