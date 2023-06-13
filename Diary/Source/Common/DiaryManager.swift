@@ -72,6 +72,26 @@ final class DiaryManager: CoreDataManageable {
         try context.save()
     }
     
+    func search(keyword: String) throws -> [Diary] {
+        let fetchRequest: NSFetchRequest<DiaryData> = DiaryData.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "content CONTAINS[cd] %@", keyword)
+        
+        do {
+            let result: [DiaryData] = try context.fetch(fetchRequest)
+            var diaries: [Diary] = []
+            
+            result.forEach { diaryData in
+                if let diary = Diary(from: diaryData) {
+                    diaries.append(diary)
+                }
+            }
+            
+            return diaries
+        } catch {
+            throw error
+        }
+    }
+    
     private func fetchObjectID(from diaryID: String?) -> NSManagedObjectID? {
         guard let diaryID: String = diaryID,
               let objectURL: URL = URL(string: diaryID),
