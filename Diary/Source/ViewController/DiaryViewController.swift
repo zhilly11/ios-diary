@@ -123,7 +123,27 @@ final class DiaryViewController: UIViewController {
     }
     
     private func setupData() {
-        contentTextView.text = diary.content
+        contentTextView.attributedText = setupAttributeString()
+    }
+    
+    private func setupAttributeString() -> NSMutableAttributedString {
+        let text = diary.content
+        var content = diary.content.split(separator: "\n").map { String($0) }
+        let title = content.removeFirst()
+        let body = content.joined()
+        
+        let titleFontSize = UIFont.systemFont(ofSize: 30)
+        let bodyFontSize = UIFont.systemFont(ofSize: 20)
+        let attributedString = NSMutableAttributedString(string: diary.content)
+        
+        attributedString.addAttribute(.font,
+                                      value: titleFontSize,
+                                      range: (text as NSString).range(of: title))
+        attributedString.addAttribute(.font,
+                                      value: bodyFontSize,
+                                      range: (text as NSString).range(of: body))
+        
+        return attributedString
     }
     
     private func setupNotification() {
