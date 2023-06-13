@@ -75,6 +75,7 @@ final class DiaryListViewController: UIViewController {
         
         setupViews()
         setupBarButtonItem()
+        setupSearchController()
     }
     
     private func setupViews() {
@@ -168,6 +169,36 @@ final class DiaryListViewController: UIViewController {
             present(alert, animated: true)
         }
     }
+    
+    private func searchDiaries(keyword: String?) {
+        guard let keyword = keyword else { return }
+        
+        if !keyword.isEmpty {
+            do {
+                let diaries: [Diary] = try diaryManager.search(keyword: keyword)
+                apply(diaries)
+            } catch {
+                NSLog("Diaries Search Failed")
+                let alert: UIAlertController = AlertFactory.make(.exit)
+                
+                present(alert, animated: true)
+            }
+        } else {
+            fetchDiaries()
+        }
+    }
+    
+    private func setupSearchController() {
+        let searchController: UISearchController = .init(searchResultsController: nil)
+        
+        searchController.searchBar.placeholder = "검색"
+        searchController.hidesNavigationBarDuringPresentation = false
+        searchController.searchResultsUpdater = self
+        
+        self.navigationItem.searchController = searchController
+        self.navigationItem.title = "일기장"
+        self.navigationItem.hidesSearchBarWhenScrolling = false
+    }
 }
 
 // MARK: - TableViewDelegate
@@ -206,5 +237,11 @@ extension DiaryListViewController: UITableViewDelegate {
         shareAction.image = UIImage(systemName: "square.and.arrow.up.fill")
         
         return UISwipeActionsConfiguration(actions: [deleteAction, shareAction])
+    }
+}
+
+extension DiaryListViewController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        searchDiaries(keyword: searchController.searchBar.text)
     }
 }
