@@ -22,6 +22,7 @@
 		B4CEA6A0295192090079FBDF /* Diary.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4CEA69F295192090079FBDF /* Diary.swift */; };
 		B4CEA6A2295193790079FBDF /* DiaryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4CEA6A1295193790079FBDF /* DiaryCell.swift */; };
 		B4D9528C2A38889C00587A4C /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4D9528B2A38889C00587A4C /* UIColor+Extension.swift */; };
+		B4D952902A38ADC700587A4C /* UIImageView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4D9528F2A38ADC700587A4C /* UIImageView+Extension.swift */; };
 		C739AE25284DF28600741E8F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C739AE24284DF28600741E8F /* AppDelegate.swift */; };
 		C739AE27284DF28600741E8F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C739AE26284DF28600741E8F /* SceneDelegate.swift */; };
 		C739AE29284DF28600741E8F /* DiaryListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C739AE28284DF28600741E8F /* DiaryListViewController.swift */; };
@@ -58,6 +59,7 @@
 		B4CEA69F295192090079FBDF /* Diary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diary.swift; sourceTree = "<group>"; };
 		B4CEA6A1295193790079FBDF /* DiaryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryCell.swift; sourceTree = "<group>"; };
 		B4D9528B2A38889C00587A4C /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
+		B4D9528F2A38ADC700587A4C /* UIImageView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImageView+Extension.swift"; sourceTree = "<group>"; };
 		C739AE21284DF28600741E8F /* Diary.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Diary.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C739AE24284DF28600741E8F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C739AE26284DF28600741E8F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -192,6 +194,7 @@
 				B414FEE32952D8AC00E7AC2A /* Locale+Extension.swift */,
 				B48B369C295AE8BB00D40CC1 /* String+Extension.swift */,
 				B4D9528B2A38889C00587A4C /* UIColor+Extension.swift */,
+				B4D9528F2A38ADC700587A4C /* UIImageView+Extension.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -379,6 +382,7 @@
 				B4182F6529627CD3009D3CA0 /* DiaryExtractor.swift in Sources */,
 				D34F1E6E2952AD0C00C1CF62 /* DiaryViewController.swift in Sources */,
 				B48B369D295AE8BB00D40CC1 /* String+Extension.swift in Sources */,
+				B4D952902A38ADC700587A4C /* UIImageView+Extension.swift in Sources */,
 				B409BC912A2B2ED900F548F5 /* NetworkManager.swift in Sources */,
 				B414FEE22952D2C400E7AC2A /* DateFormatter+Extension.swift in Sources */,
 				D3960B8E296272060098FBC7 /* ManagedObjectModel.swift in Sources */,
