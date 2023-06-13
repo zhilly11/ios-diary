@@ -8,7 +8,7 @@ import CoreLocation
 final class DiaryViewController: UIViewController {
     
     // MARK: - typealias & enum
-
+    
     private enum Constant {
         static let deleteAlertTitle = "진짜요?"
         static let deleteAlertMessage = "정말로 삭제 하시겠어요?"
@@ -27,10 +27,10 @@ final class DiaryViewController: UIViewController {
     private let locationManager: CLLocationManager?
     private let contentTextView: DiaryTextView = .init(font: .preferredFont(forTextStyle: .body),
                                                        textAlignment: .left,
-                                                       textColor: .black)
+                                                       textColor: UIColor.getTextColor())
     
     // MARK: - Initializer
-
+    
     init(diary: Diary) {
         self.diary = diary
         self.locationManager = CLLocationManager()
@@ -43,7 +43,7 @@ final class DiaryViewController: UIViewController {
     }
     
     // MARK: - View Life Cycle
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
@@ -79,7 +79,7 @@ final class DiaryViewController: UIViewController {
     }
     
     // MARK: - Method
-
+    
     private func configure() {
         title = DateFormatter.converted(date: diary.createdAt,
                                         locale: Locale.preference,
@@ -123,27 +123,8 @@ final class DiaryViewController: UIViewController {
     }
     
     private func setupData() {
-        contentTextView.attributedText = setupAttributeString()
-    }
-    
-    private func setupAttributeString() -> NSMutableAttributedString {
-        let text: String = diary.content
-        var content: [String] = diary.content.split(separator: "\n").map { String($0) }
-        let title: String = content.removeFirst()
-        let body: String = content.joined()
-        
-        let titleFontSize: UIFont = UIFont.systemFont(ofSize: 30)
-        let bodyFontSize: UIFont = UIFont.systemFont(ofSize: 20)
-        let attributedString: NSMutableAttributedString = .init(string: diary.content)
-        
-        attributedString.addAttribute(.font,
-                                      value: titleFontSize,
-                                      range: (text as NSString).range(of: title))
-        attributedString.addAttribute(.font,
-                                      value: bodyFontSize,
-                                      range: (text as NSString).range(of: body))
-        
-        return attributedString
+        contentTextView.text = diary.content
+        contentTextView.setupAttributeString()
     }
     
     private func setupNotification() {
@@ -232,6 +213,10 @@ extension DiaryViewController: UITextViewDelegate {
     func textViewDidEndEditing(_ textView: UITextView) {
         saveDiary()
     }
+    
+    func textViewDidChange(_ textView: UITextView) {
+        contentTextView.setupAttributeString()
+    }
 }
 
 // MARK: - CLLocationManagerDelegate
@@ -256,7 +241,7 @@ extension DiaryViewController: CLLocationManagerDelegate {
            diary.weatherIconID == nil,
            let coordinate: CLLocationCoordinate2D = locations.last?.coordinate {
             networkManager = NetworkManager()
-
+            
             Task.init {
                 do {
                     guard let networkManager = networkManager else { return }
