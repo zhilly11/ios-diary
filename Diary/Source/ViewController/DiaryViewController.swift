@@ -127,14 +127,14 @@ final class DiaryViewController: UIViewController {
     }
     
     private func setupAttributeString() -> NSMutableAttributedString {
-        let text = diary.content
-        var content = diary.content.split(separator: "\n").map { String($0) }
-        let title = content.removeFirst()
-        let body = content.joined()
+        let text: String = diary.content
+        var content: [String] = diary.content.split(separator: "\n").map { String($0) }
+        let title: String = content.removeFirst()
+        let body: String = content.joined()
         
-        let titleFontSize = UIFont.systemFont(ofSize: 30)
-        let bodyFontSize = UIFont.systemFont(ofSize: 20)
-        let attributedString = NSMutableAttributedString(string: diary.content)
+        let titleFontSize: UIFont = UIFont.systemFont(ofSize: 30)
+        let bodyFontSize: UIFont = UIFont.systemFont(ofSize: 20)
+        let attributedString: NSMutableAttributedString = .init(string: diary.content)
         
         attributedString.addAttribute(.font,
                                       value: titleFontSize,
