@@ -25,6 +25,7 @@ final class DiaryViewController: UIViewController {
     private let diaryManager: DiaryManager = DiaryManager.shared
     private var networkManager: NetworkManager?
     private let locationManager: CLLocationManager?
+    private let titleView: DiaryTitleView
     private let contentTextView: DiaryTextView = .init(font: .preferredFont(forTextStyle: .body),
                                                        textAlignment: .left,
                                                        textColor: UIColor.getTextColor())
@@ -34,6 +35,7 @@ final class DiaryViewController: UIViewController {
     init(diary: Diary) {
         self.diary = diary
         self.locationManager = CLLocationManager()
+        self.titleView = DiaryTitleView(createdAt: diary.createdAt, weatherIconID: diary.weatherIconID)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -81,9 +83,8 @@ final class DiaryViewController: UIViewController {
     // MARK: - Method
     
     private func configure() {
-        title = DateFormatter.converted(date: diary.createdAt,
-                                        locale: Locale.preference,
-                                        dateStyle: .long)
+        self.navigationItem.titleView = self.titleView
+        
         contentTextView.delegate = self
         contentTextView.keyboardDismissMode = .interactive
         
