@@ -5,7 +5,7 @@ import Foundation
 
 extension DateFormatter {
     static func converted(date: Date, locale: Locale, dateStyle: DateFormatter.Style) -> String {
-        let dateFormatter = DateFormatter()
+        let dateFormatter: DateFormatter = DateFormatter()
         
         dateFormatter.locale = locale
         dateFormatter.dateStyle = dateStyle

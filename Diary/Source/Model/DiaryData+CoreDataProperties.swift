@@ -11,4 +11,6 @@ extension DiaryData {
 
     @NSManaged public var content: String?
     @NSManaged public var createdAt: Date?
+    @NSManaged public var weatherMain: String?
+    @NSManaged public var weatherIconID: String?
 }

@@ -3,7 +3,7 @@
 
 import UIKit
 
-class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
 
     func scene(
@@ -11,17 +11,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         willConnectTo session: UISceneSession,
         options connectionOptions: UIScene.ConnectionOptions
     ) {
-        guard let windowScene = (scene as? UIWindowScene) else { return }
-        window = UIWindow(windowScene: windowScene)
-        let mainViewController = DiaryListViewController()
-        let navigationController = UINavigationController(rootViewController: mainViewController)
+        guard let windowScene: UIWindowScene = (scene as? UIWindowScene) else { return }
         
-        let navigationBarAppearance = UINavigationBarAppearance()
+        let mainViewController: DiaryListViewController = .init()
+        let navigationController: UINavigationController = .init(rootViewController: mainViewController)
+        let navigationBarAppearance: UINavigationBarAppearance = .init()
+        
         navigationBarAppearance.configureWithOpaqueBackground()
-        
         navigationController.navigationBar.standardAppearance = navigationBarAppearance
         navigationController.navigationBar.scrollEdgeAppearance = navigationBarAppearance
         
+        window = UIWindow(windowScene: windowScene)
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
     }

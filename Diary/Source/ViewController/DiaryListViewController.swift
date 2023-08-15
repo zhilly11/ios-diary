@@ -3,10 +3,18 @@
 
 import UIKit
 
+/// 다이어리 목록 화면
 final class DiaryListViewController: UIViewController {
+    
+    // MARK: - typealias & enum
+    
+    private typealias DataSource = UITableViewDiffableDataSource<DiarySection, Diary>
+    private typealias SnapShot = NSDiffableDataSourceSnapshot<DiaryListViewController.DiarySection, Diary>
+    
     private enum DiarySection: Hashable {
         case main
     }
+    
     private enum Constant {
         static let title = "일기장"
         static let sampleDataName = "sample"
@@ -14,10 +22,13 @@ final class DiaryListViewController: UIViewController {
         static let deleteFailAlertTitle = "다이어리 삭제 실패"
         static let addFailAlertTitle = "다이어리 생성 실패"
     }
-    private let diaryManager = DiaryManager.shared
+    
+    // MARK: - Properties
+    
+    private let diaryManager: DiaryManager = DiaryManager.shared
     
     private let diaryTableView: UITableView = {
-        let tableView = UITableView(frame: .zero, style: .plain)
+        let tableView: UITableView = .init(frame: .zero, style: .plain)
         
         tableView.register(DiaryCell.self, forCellReuseIdentifier: DiaryCell.reuseIdentifier)
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -25,11 +36,16 @@ final class DiaryListViewController: UIViewController {
         return tableView
     }()
     
-    private lazy var diaryDataSource: UITableViewDiffableDataSource = {
-        let dataSource = UITableViewDiffableDataSource<DiarySection, Diary>(
-            tableView: diaryTableView
+    private var diaryDataSource: DataSource
+    
+    // MARK: - Initializer
+    
+    init() {
+        self.diaryDataSource = .init(
+            tableView: self.diaryTableView
         ) { (tableView, indexPath, diary) -> UITableViewCell? in
-            guard let cell = tableView.dequeueReusableCell(
+            
+            guard let cell: DiaryCell = tableView.dequeueReusableCell(
                 withIdentifier: DiaryCell.reuseIdentifier,
                 for: indexPath
             ) as? DiaryCell else { return nil }
@@ -39,8 +55,15 @@ final class DiaryListViewController: UIViewController {
             return cell
         }
         
-        return dataSource
-    }()
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - View Life Cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,6 +75,8 @@ final class DiaryListViewController: UIViewController {
         fetchDiaries()
     }
     
+    // MARK: - Method
+    
     private func configure() {
         view.backgroundColor = .systemBackground
         title = Constant.title
@@ -59,10 +84,11 @@ final class DiaryListViewController: UIViewController {
         
         setupViews()
         setupBarButtonItem()
+        setupSearchController()
     }
     
     private func setupViews() {
-        let safeArea = view.safeAreaLayoutGuide
+        let safeArea: UILayoutGuide = view.safeAreaLayoutGuide
         
         view.addSubview(diaryTableView)
         NSLayoutConstraint.activate([
@@ -74,26 +100,25 @@ final class DiaryListViewController: UIViewController {
     }
     
     private func setupBarButtonItem() {
-        let rightBarButton = UIBarButtonItem(image: UIImage(systemName: "plus"),
-                                             style: .plain,
-                                             target: self,
-                                             action: #selector(tappedAddButton))
+        let addAction: UIAction = .init { _ in
+            self.tappedAddButton()
+        }
+        let rightBarButton: UIBarButtonItem = .init(image: UIImage(systemName: "plus"),
+                                                    primaryAction: addAction)
         
         navigationItem.setRightBarButton(rightBarButton, animated: true)
     }
     
     private func pushDiaryViewController(with indexPath: IndexPath) {
-        guard let diary = diaryDataSource.itemIdentifier(for: indexPath) else {
-            return
-        }
-        let diaryViewController = DiaryViewController(diary: diary)
+        guard let diary: Diary = diaryDataSource.itemIdentifier(for: indexPath) else { return }
+        let diaryViewController: DiaryViewController = .init(diary: diary)
         
         navigationController?.pushViewController(diaryViewController, animated: true)
     }
     
     private func showShareActivityView(for diary: Diary) {
-        let activityViewController = UIActivityViewController(activityItems: [diary.content],
-                                                              applicationActivities: nil)
+        let activityViewController: UIActivityViewController = .init(activityItems: [diary.content],
+                                                                     applicationActivities: nil)
         
         present(activityViewController, animated: true)
     }
@@ -104,51 +129,88 @@ final class DiaryListViewController: UIViewController {
             deleteDiaryItem(of: diary)
         } catch {
             NSLog("Diary Delete Failed")
-            let alert = AlertFactory.make(.failure(title: Constant.deleteFailAlertTitle, message: nil))
+            let alert: UIAlertController = AlertFactory.make(
+                .failure(title: Constant.deleteFailAlertTitle, message: nil)
+            )
+            
             present(alert, animated: true)
         }
     }
     
     private func deleteDiaryItem(of diary: Diary) {
-        var currentSnapshot = diaryDataSource.snapshot()
+        var snapshot: SnapShot = diaryDataSource.snapshot()
         
-        currentSnapshot.deleteItems([diary])
-        diaryDataSource.apply(currentSnapshot)
+        snapshot.deleteItems([diary])
+        diaryDataSource.apply(snapshot)
     }
     
     private func apply(_ diaries: [Diary]) {
-        var snapshot = NSDiffableDataSourceSnapshot<DiarySection, Diary>()
+        var snapshot: SnapShot = NSDiffableDataSourceSnapshot<DiarySection, Diary>()
         
         snapshot.appendSections([.main])
         snapshot.appendItems(diaries)
         diaryDataSource.apply(snapshot)
     }
     
-    @objc
-    private func tappedAddButton(_ sender: UIBarButtonItem) {
+    private func tappedAddButton() {
         do {
             try diaryManager.add(nil)
             fetchDiaries()
             pushDiaryViewController(with: Constant.firstDiary)
         } catch {
             NSLog("Diary Add Failed")
-            let alert = AlertFactory.make(.failure(title: Constant.addFailAlertTitle, message: nil))
+            let alert: UIAlertController = AlertFactory.make(
+                .failure(title: Constant.addFailAlertTitle, message: nil)
+            )
+            
             present(alert, animated: true)
         }
     }
     
-    @objc
     private func fetchDiaries() {
         do {
-            let diaries = try diaryManager.fetchObjects()
+            let diaries: [Diary] = try diaryManager.fetchObjects()
             apply(diaries)
         } catch {
             NSLog("Diaries Fetch Failed")
-            let alert = AlertFactory.make(.exit)
+            let alert: UIAlertController = AlertFactory.make(.exit)
+            
             present(alert, animated: true)
         }
     }
+    
+    private func searchDiaries(keyword: String?) {
+        guard let keyword = keyword else { return }
+        
+        if !keyword.isEmpty {
+            do {
+                let diaries: [Diary] = try diaryManager.search(keyword: keyword)
+                apply(diaries)
+            } catch {
+                NSLog("Diaries Search Failed")
+                let alert: UIAlertController = AlertFactory.make(.exit)
+                
+                present(alert, animated: true)
+            }
+        } else {
+            fetchDiaries()
+        }
+    }
+    
+    private func setupSearchController() {
+        let searchController: UISearchController = .init(searchResultsController: nil)
+        
+        searchController.searchBar.placeholder = "검색"
+        searchController.hidesNavigationBarDuringPresentation = false
+        searchController.searchResultsUpdater = self
+        
+        self.navigationItem.searchController = searchController
+        self.navigationItem.title = "일기장"
+        self.navigationItem.hidesSearchBarWhenScrolling = false
+    }
 }
+
+// MARK: - TableViewDelegate
 
 extension DiaryListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -160,9 +222,9 @@ extension DiaryListViewController: UITableViewDelegate {
         _ tableView: UITableView,
         trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
     ) -> UISwipeActionsConfiguration? {
-        let deleteAction = UIContextualAction(style: .destructive,
-                                              title: nil) { [weak self] (_, _, success) in
-            if let diary = self?.diaryDataSource.itemIdentifier(for: indexPath) {
+        let deleteAction: UIContextualAction = .init(style: .destructive,
+                                                     title: nil) { [weak self] (_, _, success) in
+            if let diary: Diary = self?.diaryDataSource.itemIdentifier(for: indexPath) {
                 self?.delete(diary)
                 success(true)
             } else {
@@ -171,9 +233,9 @@ extension DiaryListViewController: UITableViewDelegate {
         }
         deleteAction.image = UIImage(systemName: "trash.fill")
         
-        let shareAction = UIContextualAction(style: .normal,
-                                             title: nil) { [weak self] (_, _, success) in
-            if let diary = self?.diaryDataSource.itemIdentifier(for: indexPath) {
+        let shareAction: UIContextualAction = .init(style: .normal,
+                                                    title: nil) { [weak self] (_, _, success) in
+            if let diary: Diary = self?.diaryDataSource.itemIdentifier(for: indexPath) {
                 self?.showShareActivityView(for: diary)
                 success(true)
             } else {
@@ -184,5 +246,11 @@ extension DiaryListViewController: UITableViewDelegate {
         shareAction.image = UIImage(systemName: "square.and.arrow.up.fill")
         
         return UISwipeActionsConfiguration(actions: [deleteAction, shareAction])
+    }
+}
+
+extension DiaryListViewController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        searchDiaries(keyword: searchController.searchBar.text)
     }
 }

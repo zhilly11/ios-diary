@@ -4,7 +4,7 @@
 import UIKit
 
 final class ExitAlert: UIAlertController {
-    let confirmAction = UIAlertAction(title: "확인", style: .cancel) { _ in
+    private let confirmAction: UIAlertAction = .init(title: "확인", style: .cancel) { _ in
         exit(0)
     }
     

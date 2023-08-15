@@ -12,12 +12,12 @@ enum DiaryExtractor {
     }
     
     static func extract(of diary: Diary) -> DiaryCellContents {
-        let contents = diary.content
+        let contents: [String] = diary.content
             .components(separatedBy: .newlines)
             .filter { $0.isEmpty == false }
-        let title = contents.first ?? Constant.defaultTitle
-        let body = contents.count >= 2 ? contents[1] : Constant.defaultBody
-        let createdAt = DateFormatter.converted(date: diary.createdAt,
+        let title: String = contents.first ?? Constant.defaultTitle
+        let body: String = contents.count >= 2 ? contents[1] : Constant.defaultBody
+        let createdAt: String = DateFormatter.converted(date: diary.createdAt,
                                                 locale: Locale.preference,
                                                 dateStyle: .long)
     

@@ -5,9 +5,9 @@ import UIKit
 
 final class DiaryCell: UITableViewCell, ReusableView {
     private let titleLabel: UILabel = {
-        let label = UILabel()
+        let label: UILabel = .init()
         
-        label.textColor = .black
+        label.textColor = UIColor.getTextColor()
         label.textAlignment = .left
         label.font = .preferredFont(forTextStyle: .title3)
         
@@ -15,9 +15,9 @@ final class DiaryCell: UITableViewCell, ReusableView {
     }()
     
     private let createdDateLabel: UILabel = {
-        let label = UILabel()
+        let label: UILabel = .init()
         
-        label.textColor = .black
+        label.textColor = UIColor.getTextColor()
         label.textAlignment = .left
         label.font = .preferredFont(forTextStyle: .body)
         
@@ -25,9 +25,9 @@ final class DiaryCell: UITableViewCell, ReusableView {
     }()
     
     private let bodyLabel: UILabel = {
-        let label = UILabel()
+        let label: UILabel = .init()
         
-        label.textColor = .black
+        label.textColor = UIColor.getTextColor()
         label.textAlignment = .left
         label.font = .preferredFont(forTextStyle: .caption1)
         
@@ -35,7 +35,7 @@ final class DiaryCell: UITableViewCell, ReusableView {
     }()
     
     private let contentsStackView: UIStackView = {
-        let stackView = UIStackView()
+        let stackView: UIStackView = .init()
         
         stackView.axis = .vertical
         stackView.spacing = 8
@@ -44,8 +44,16 @@ final class DiaryCell: UITableViewCell, ReusableView {
         return stackView
     }()
     
+    private let weatherIconImageView: UIImageView = {
+        let imageView: UIImageView = .init()
+        
+        imageView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        
+        return imageView
+    }()
+    
     private let dateAndBodyStackView: UIStackView = {
-        let stackView = UIStackView()
+        let stackView: UIStackView = .init()
         
         stackView.axis = .horizontal
         stackView.spacing = 8
@@ -65,22 +73,29 @@ final class DiaryCell: UITableViewCell, ReusableView {
     }
     
     private func setupViews() {
-        dateAndBodyStackView.addArrangedSubview(createdDateLabel)
-        dateAndBodyStackView.addArrangedSubview(bodyLabel)
-        contentsStackView.addArrangedSubview(titleLabel)
-        contentsStackView.addArrangedSubview(dateAndBodyStackView)
-        contentView.addSubview(contentsStackView)
+        [createdDateLabel,
+         weatherIconImageView,
+         bodyLabel].forEach(dateAndBodyStackView.addArrangedSubview(_:))
         
-        let contentsStackViewBottomConstraint = contentsStackView.bottomAnchor.constraint(
+        [titleLabel,
+         dateAndBodyStackView].forEach(contentsStackView.addArrangedSubview(_:))
+        
+        [contentsStackView].forEach(contentView.addSubview(_:))
+        
+        let contentsStackViewBottomConstraint: NSLayoutConstraint = contentsStackView.bottomAnchor.constraint(
             equalTo: contentView.bottomAnchor,
-            constant: -8)
+            constant: -8
+        )
         contentsStackViewBottomConstraint.priority = .defaultHigh
         
         NSLayoutConstraint.activate([
-            contentsStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
             contentsStackViewBottomConstraint,
+            contentsStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
             contentsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
-            contentsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8)
+            contentsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
+            
+            weatherIconImageView.widthAnchor.constraint(equalToConstant: 24),
+            weatherIconImageView.heightAnchor.constraint(equalToConstant: 24)
         ])
         
         createdDateLabel.setContentHuggingPriority(.required, for: .horizontal)
@@ -88,9 +103,11 @@ final class DiaryCell: UITableViewCell, ReusableView {
     }
     
     func configure(with diary: Diary) {
-        let cellContents = DiaryExtractor.extract(of: diary)
+        let cellContents: DiaryExtractor.DiaryCellContents = DiaryExtractor.extract(of: diary)
+        
         titleLabel.text = cellContents.title
         bodyLabel.text = cellContents.body
         createdDateLabel.text = cellContents.createdAt
+        weatherIconImageView.loadWeatherIcon(id: diary.weatherIconID)
     }
 }

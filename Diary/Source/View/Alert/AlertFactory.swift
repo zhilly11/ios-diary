@@ -8,11 +8,12 @@ enum AlertKind {
     case exit
 }
 
-class AlertFactory {
+final class AlertFactory {
     private enum Constant {
-        static let exitAlertTitle = "종료"
-        static let exitAlertMessage = "다이어리 불러오기 실패하여 앱을 종료합니다."
+        static let exitAlertTitle: String = "종료"
+        static let exitAlertMessage: String = "다이어리 불러오기 실패하여 앱을 종료합니다."
     }
+    
     static func make(_ alertKind: AlertKind) -> UIAlertController {
         switch alertKind {
         case .failure(let title, let message):
